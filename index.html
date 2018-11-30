@@ -1,0 +1,547 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>circleci-api</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">circleci-api</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> circleci-api</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="circleci-api-wrapper">CircleCi API Wrapper</h1>
+				<p><a href="https://circleci.com/gh/jordond/circleci-api"><img src="https://circleci.com/gh/jordond/circleci-api.svg?style=svg" alt="CircleCI"></a> <a href="https://travis-ci.org/jordond/circleci-api"><img src="https://travis-ci.org/jordond/circleci-api.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/github/jordond/circleci-api?branch=master"><img src="https://coveralls.io/repos/github/jordond/circleci-api/badge.svg?branch=master" alt="Coverage Status"></a> <a href="https://badge.fury.io/js/circleci-api"><img src="https://badge.fury.io/js/circleci-api.svg" alt="npm version"></a></p>
+				<p><a href="https://greenkeeper.io/"><img src="https://badges.greenkeeper.io/jordond/circleci-api.svg" alt="Greenkeeper badge"></a> <a href="https://david-dm.org/jordond/circleci-api"><img src="https://david-dm.org/jordond/circleci-api/status.svg" alt="dependencies Status"></a> <a href="https://david-dm.org/jordond/circleci-api?type=dev"><img src="https://david-dm.org/jordond/circleci-api/dev-status.svg" alt="devDependencies Status"></a></p>
+				<p>A wrapper around the <a href="https://circleci.com/docs/api/v1-reference/">CircleCi API</a> written in TypeScript. If used in a TypeScript project, you will get types, and auto-complete for all of the api responses. You will no longer need to tab back and fourth to the API documentation. Will work in Node or the browser!</p>
+				<p>I recommend using this library if you are writing a tool or website in TypeScript. I have created definitions for each of the CircleCi endpoints. There may still be some errors, but I am open to contributions on making them better.</p>
+				<p>If there are any features you would like, please feel free to open up an issue.</p>
+				<h2 id="installation">Installation</h2>
+				<p>Add using yarn or npm</p>
+				<pre><code class="language-bash">yarn add circleci-api
+
+<span class="hljs-comment">## or</span>
+
+npm install circleci-api</code></pre>
+				<h2 id="usage">Usage</h2>
+				<p>Get your API token from <a href="https://circleci.com/account/api">CircleCi</a></p>
+				<p>There are two ways to use this library.</p>
+				<h2 id="1-circleci-class">1. CircleCi class</h2>
+				<p>Get instance of the factory.</p>
+				<pre><code class="language-typescript">// Module
+import { CircleCI, GitType, CircleCIOptions } from "circleci-api";
+
+// Configure the factory with some defaults
+const options: CircleCIOptions = {
+  // Required for all requests
+  token: "", // Set your CircleCi API token
+
+  // Optional
+  // Anything set here can be overriden when making the request
+
+  // Git information is required for project/build/etc endpoints
+  vcs: {
+    type: GitType.GITHUB, // default: github
+    owner: "jordond",
+    repo: "circleci-api"
+  }
+
+  // Optional query params for requests
+  options: {
+    branch: "master", // default: master
+    filter: "completed"
+  }
+}
+
+// Create the api object
+const api = new CircleCI(options)
+
+// Use the api
+
+/**
+ * Grab the latest artifacts from a successful build on a certain branch
+ * @param [branch="master"] - Artifacts for certain branch
+ * @return List of successfully built artifact objects
+ */
+export async function getLatestArtifacts(branch: string = "master"): Promise&lt;Artifact[]&gt; {
+  try {
+    // Will use the repo defined in the options above
+    const result: Aritfact[] = await api.latestArtifacts({ branch, filter: "successful" })
+    console.log(`Found ${result.length} artifacts`)
+    return result
+  } catch (error) {
+    console.log("No build artifacts found")
+  }
+
+  return []
+}
+
+getLatestArtifacts("develop")
+  .then(artifacts =&gt; {
+    artifacts
+      .forEach(({ path, url }: Artifact) =&gt; console.log(`${path} -&gt; ${url}`))
+  })
+
+// Or override settings set above
+api
+  .latestArtifacts(
+    { branch: "develop" },
+    {
+      vcs: { repo: "awesome-repo" },
+      options: { filter: "successful" }
+    }
+  )
+  .then((artifacts: Artifact[]) =&gt; console.log(`Found ${artifacts.length} artifacts`))
+  .catch(error =&gt; console.error(error))</code></pre>
+				<h2 id="2-manually">2. Manually</h2>
+				<p>The individual functions can also be imported if you only need one or two. To help with tree-shaking.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { getMe, getLatestArtifacts } <span class="hljs-keyword">from</span> <span class="hljs-string">"circleci-api"</span>;
+
+<span class="hljs-keyword">const</span> CIRCLECI_TOKEN: <span class="hljs-built_in">string</span> = <span class="hljs-string">"circle-ci-token"</span>;
+
+getMe(CIRCLECI_TOKEN)
+  .then(<span class="hljs-function"><span class="hljs-params">me</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"token is valid"</span>))
+  .catch(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> <span class="hljs-built_in">console</span>.error(<span class="hljs-string">"invalid token"</span>));
+
+getLatestArtifacts(CIRCLECI_TOKEN, {
+  vcs: {
+    owner: <span class="hljs-string">"billyBob"</span>,
+    repo: <span class="hljs-string">"super-cool-app"</span>
+  },
+  options: {
+    filter: <span class="hljs-string">"failed"</span>,
+    branch: <span class="hljs-string">"feature-smith2"</span>
+  }
+})
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`Found <span class="hljs-subst">${result.length}</span> artifacts`</span>))
+  .catch(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> <span class="hljs-built_in">console</span>.error(error));</code></pre>
+				<h2 id="demo">Demo</h2>
+				<p>There are three similar demos are available in the <code>demo</code> folder.</p>
+				<p><strong>Note:</strong> I recommend <a href="https://code.visualstudio.com/">VSCode</a> for viewing and editing the examples. It will give you great intellisense about the library.</p>
+				<p>For the TypeScript &amp; JavaScript follow the steps below:</p>
+				<pre><code class="language-bash"><span class="hljs-comment"># Step 1 - Change into demo folder and install dependencies</span>
+<span class="hljs-built_in">cd</span> demo
+yarn
+
+<span class="hljs-comment"># Javascript example:</span>
+node ./index.js
+
+<span class="hljs-comment"># Typescript example:</span>
+npx ts-node --project ../tsconfig.base.json ./index.ts
+
+<span class="hljs-comment"># To view Browser example, first build project</span>
+yarn build
+
+<span class="hljs-comment"># Then open `index.html` in your browser</span></code></pre>
+				<h2 id="supported-endpoints">Supported endpoints</h2>
+				<p>Using factory:</p>
+				<p>Optional properties:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> CircleRequest {
+  token?: <span class="hljs-built_in">string</span>;
+  vcs?: GitInfo;
+  options?: Options;
+}</code></pre>
+				<p>Any function with an <em>optional</em> paramater of <code>CircleRequest</code> can override any of the values you assigned when using the <code>circleci()</code> factory.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th align="center">Required</th>
+							<th align="center">Optional</th>
+							<th align="right">Returns</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td><code>me()</code></td>
+							<td align="center">none</td>
+							<td align="center">none</td>
+							<td align="right"><code>Me</code></td>
+						</tr>
+						<tr>
+							<td><code>projects()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>Project[]</code></td>
+						</tr>
+						<tr>
+							<td><code>followProject()</code></td>
+							<td align="center"><code>{ vcs: GitInfo }</code></td>
+							<td align="center">none</td>
+							<td align="right"><code>FollowNewResult</code></td>
+						</tr>
+						<tr>
+							<td><code>recentBuilds()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>{ limit: number, offset: number }</code></td>
+							<td align="right"><code>BuildSummary[]</code></td>
+						</tr>
+						<tr>
+							<td><code>builds()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>{ limit: number, offset: number }</code></td>
+							<td align="right"><code>BuildSummary[]</code></td>
+						</tr>
+						<tr>
+							<td><code>buildsFor()</code></td>
+							<td align="center"><code>branch: string = &quot;master&quot;</code></td>
+							<td align="center"><code>{ limit: number, offset: number }</code></td>
+							<td align="right"><code>BuildSummary[]</code></td>
+						</tr>
+						<tr>
+							<td><code>build()</code></td>
+							<td align="center"><code>buildNumber: number</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>BuildWithSteps</code></td>
+						</tr>
+						<tr>
+							<td><code>artifacts()</code></td>
+							<td align="center"><code>buildNumber: number</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>Artifact[]</code></td>
+						</tr>
+						<tr>
+							<td><code>latestArtifacts()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>Artifact[]</code></td>
+						</tr>
+						<tr>
+							<td><code>retry()</code></td>
+							<td align="center"><code>buildNumber: number</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>BuildSummary</code></td>
+						</tr>
+						<tr>
+							<td><code>cancel()</code></td>
+							<td align="center"><code>buildNumber: number</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>BuildSummary</code></td>
+						</tr>
+						<tr>
+							<td><code>triggerBuild()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>Build</code></td>
+						</tr>
+						<tr>
+							<td><code>triggerBuildFor()</code></td>
+							<td align="center"><code>branch: string = &quot;master&quot;</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>Build</code></td>
+						</tr>
+						<tr>
+							<td><code>clearCache()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>ClearCacheResponse</code></td>
+						</tr>
+						<tr>
+							<td><code>listEnvVars()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>EnvVariable[]</code></td>
+						</tr>
+						<tr>
+							<td><code>addEnvVar()</code></td>
+							<td align="center"><code>variable: EnvVariable</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>EnvVariable</code></td>
+						</tr>
+						<tr>
+							<td><code>getEnvVar()</code></td>
+							<td align="center"><code>envName: string</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>EnvVariable</code></td>
+						</tr>
+						<tr>
+							<td><code>deleteEnvVar()</code></td>
+							<td align="center"><code>envName: string</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>MessageResponse</code></td>
+						</tr>
+						<tr>
+							<td><code>checkoutKeys()</code></td>
+							<td align="center">none</td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>CheckoutKeyResponse</code></td>
+						</tr>
+						<tr>
+							<td><code>createCheckoutKey()</code></td>
+							<td align="center"><code>type: CheckoutType</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>CheckoutKeyResponse</code></td>
+						</tr>
+						<tr>
+							<td><code>checkoutKey()</code></td>
+							<td align="center"><code>fingerprint: string</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>CheckoutKeyResponse</code></td>
+						</tr>
+						<tr>
+							<td><code>deleteCheckoutKey()</code></td>
+							<td align="center"><code>fingerprint: string</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>DeleteCheckoutKeyResponse</code></td>
+						</tr>
+						<tr>
+							<td><code>getTestMetadata()</code></td>
+							<td align="center"><code>buildNumber: number</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right"><code>TestMetadataResponse</code></td>
+						</tr>
+						<tr>
+							<td><code>addSSHKey()</code></td>
+							<td align="center"><code>key: SSHKey</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right">none</td>
+						</tr>
+						<tr>
+							<td><code>addHerokuKey()</code></td>
+							<td align="center"><code>key: HerokuKey</code></td>
+							<td align="center"><code>CircleRequest</code></td>
+							<td align="right">none</td>
+						</tr>
+				</tbody></table>
+				<h2 id="missing-endpoint">Missing endpoint</h2>
+				<p>The last remaining endpoint probably won&#39;t be added unless there is demand.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th align="center">Link</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>Add user to build</td>
+							<td align="center"><a href="https://circleci.com/docs/api/v1-reference/#add-user-ssh">ref</a></td>
+						</tr>
+				</tbody></table>
+				<h2 id="contributing">Contributing</h2>
+				<p>This library uses boilerplate <a href="https://github.com/alexjoverm/typescript-library-starter">typescript-library-starter</a>. So see that repo for more information about the setup, and layout of the files.</p>
+				<ol>
+					<li>Fork this repo</li>
+					<li>Add your awesome feature</li>
+					<li>If adding functionality, add tests for your feature</li>
+					<li>Submit a PR</li>
+				</ol>
+				<p>Example:</p>
+				<pre><code class="language-bash"><span class="hljs-comment"># Setup</span>
+git <span class="hljs-built_in">clone</span> https://github.com/jordond/circleci-api
+<span class="hljs-built_in">cd</span> circleci-api
+
+yarn
+
+<span class="hljs-comment"># Make some changes</span>
+
+...
+
+<span class="hljs-comment"># Run tests then build</span>
+yarn <span class="hljs-built_in">test</span>:prod
+yarn build
+
+<span class="hljs-comment"># If all is good, open a PR!</span></code></pre>
+				<h2 id="license">License</h2>
+				<pre><code>Copyright 2018 Jordon de Hoog
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to <span class="hljs-keyword">use</span>, copy,
+<span class="hljs-keyword">modify</span>, <span class="hljs-keyword">merge</span>, publish, <span class="hljs-keyword">distribute</span>, sublicense, <span class="hljs-keyword">and</span>/<span class="hljs-keyword">or</span> sell copies <span class="hljs-keyword">of</span> the Software, <span class="hljs-keyword">and</span> <span class="hljs-keyword">to</span> permit persons <span class="hljs-keyword">to</span> whom the
+Software <span class="hljs-keyword">is</span> furnished <span class="hljs-keyword">to</span> <span class="hljs-keyword">do</span> so, subject <span class="hljs-keyword">to</span> the <span class="hljs-keyword">following</span> conditions:
+
+The above copyright <span class="hljs-keyword">notice</span> <span class="hljs-keyword">and</span> this permission <span class="hljs-keyword">notice</span> shall be included <span class="hljs-keyword">in</span> all copies <span class="hljs-keyword">or</span> substantial portions <span class="hljs-keyword">of</span> the
+Software.
+
+THE SOFTWARE <span class="hljs-keyword">IS</span> PROVIDED <span class="hljs-string">"AS IS"</span>, <span class="hljs-keyword">WITHOUT</span> WARRANTY <span class="hljs-keyword">OF</span> <span class="hljs-keyword">ANY</span> KIND, EXPRESS <span class="hljs-keyword">OR</span> IMPLIED, <span class="hljs-keyword">INCLUDING</span> BUT <span class="hljs-keyword">NOT</span> LIMITED <span class="hljs-keyword">TO</span> THE
+WARRANTIES <span class="hljs-keyword">OF</span> MERCHANTABILITY, FITNESS <span class="hljs-keyword">FOR</span> A PARTICULAR PURPOSE <span class="hljs-keyword">AND</span> NONINFRINGEMENT. <span class="hljs-keyword">IN</span> <span class="hljs-keyword">NO</span> <span class="hljs-keyword">EVENT</span> SHALL THE <span class="hljs-keyword">AUTHORS</span> <span class="hljs-keyword">OR</span>
+COPYRIGHT HOLDERS BE LIABLE <span class="hljs-keyword">FOR</span> <span class="hljs-keyword">ANY</span> CLAIM, DAMAGES <span class="hljs-keyword">OR</span> OTHER LIABILITY, WHETHER <span class="hljs-keyword">IN</span> AN <span class="hljs-keyword">ACTION</span> <span class="hljs-keyword">OF</span> CONTRACT, TORT <span class="hljs-keyword">OR</span> OTHERWISE,
+ARISING <span class="hljs-keyword">FROM</span>, <span class="hljs-keyword">OUT</span> <span class="hljs-keyword">OF</span> <span class="hljs-keyword">OR</span> <span class="hljs-keyword">IN</span> <span class="hljs-keyword">CONNECTION</span> <span class="hljs-keyword">WITH</span> THE SOFTWARE <span class="hljs-keyword">OR</span> THE <span class="hljs-keyword">USE</span> <span class="hljs-keyword">OR</span> OTHER DEALINGS <span class="hljs-keyword">IN</span> THE SOFTWARE.</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_actions_.html">"api/actions"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_artifacts_.html">"api/artifacts"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_builds_.html">"api/builds"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_cache_.html">"api/cache"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_checkout_keys_.html">"api/checkout-<wbr>keys"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_env_.html">"api/env"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_index_.html">"api/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_metadata_.html">"api/metadata"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_misc_.html">"api/misc"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_projects_.html">"api/projects"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_api_user_.html">"api/user"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_circleci_.html">"circleci"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_client_.html">"client"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_index_.html">"index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_types_api_.html">"types/api"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_types_index_.html">"types/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_types_lib_.html">"types/lib"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_util_.html">"util"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
